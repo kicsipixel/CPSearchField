@@ -11,29 +11,84 @@
 
 @implementation AppController : CPObject
 {
+    CPSearchField searchField;
+    CPArray contacts;
+    JSObject objsToDisplay;
+    CPTableView myList;
 }
 
 - (void)applicationDidFinishLaunching:(CPNotification)aNotification
 {
+    // main window
     var theWindow = [[CPWindow alloc] initWithContentRect:CGRectMakeZero() styleMask:CPBorderlessBridgeWindowMask],
         contentView = [theWindow contentView];
 
-    var label = [[CPTextField alloc] initWithFrame:CGRectMakeZero()];
+    contacts = ["Andy1", "Andy12", "Andy123", "Bjorn","Camille"];
+    objsToDisplay = contacts;
+    // creating scrollview
+    var scrollView = [[CPScrollView alloc] initWithFrame: CGRectMake(100,100,330,300)];
 
-    [label setStringValue:@"Hello World!"];
-    [label setFont:[CPFont boldSystemFontOfSize:24.0]];
+    // creating tableview
+    myList = [[CPTableView alloc] initWithFrame: CGRectMakeZero()];
 
-    [label sizeToFit];
+    // creating column in the table
+    var nameColumn = [[CPTableColumn alloc] initWithIdentifier:@"name" ];
+    [[nameColumn headerView] setStringValue:@"Name"];
+    [nameColumn setWidth:300];
 
-    [label setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
-    [label setCenter:[contentView center]];
+    [myList addTableColumn: nameColumn];
+    [myList setDataSource: self];
+    [myList setDelegate: self];
 
-    [contentView addSubview:label];
+    [scrollView setBorderType: CPBezelBorder];
+    [scrollView setDocumentView: myList];
 
+    // searchfield
+    searchField = [[CPSearchField alloc] initWithFrame: CGRectMake(0,10,200,30)];
+    [searchField setEditable: YES];
+    [searchField setPlaceholderString:@"What are you looking for?"];
+    [searchField setBordered: YES];
+    [searchField setBezeled: YES];
+    [searchField setFont:[CPFont systemFontOfSize: 12.0]];
+    [searchField setTarget: self];
+    [searchField setAction:@selector(searchChanged:)];
+    [searchField setSendsWholeSearchString: NO];
+
+    [contentView addSubview: scrollView];
+    [contentView addSubview: searchField];
     [theWindow orderFront:self];
 
     // Uncomment the following line to turn on the standard menu bar.
     //[CPMenu setMenuBarVisible:YES];
+}
+
+- (int) numberOfRowsInTableView: (CPTableView)aTableView
+{
+    return [objsToDisplay count];
+}
+
+-(id) tableView:(CPTableView)aTableView objectValueForTableColumn: (CPTableColumn)aColumn row:(int)rowIndex
+{
+
+    return [objsToDisplay objectAtIndex: rowIndex];
+}
+
+-(void) searchChanged:(id)sender
+{
+    if (sender)
+        searchString = [[sender stringValue] lowercaseString];
+
+    if(searchString)
+        objsToDisplay = [];
+        var count = 0;
+        for(var i = 0; i < contacts.length; i++)
+              if([[contacts objectAtIndex:i] lowercaseString].match(searchString))
+               {
+                objsToDisplay[count] = contacts[i];
+                count++;
+                }
+
+    [myList reloadData];
 }
 
 @end
