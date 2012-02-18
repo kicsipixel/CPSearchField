@@ -44,7 +44,7 @@
     [scrollView setDocumentView: myList];
 
     // searchfield
-    searchField = [[CPSearchField alloc] initWithFrame: CGRectMake(0,10,200,30)];
+    searchField = [[CPSearchField alloc] initWithFrame: CGRectMake(100,50,320,30)];
     [searchField setEditable: YES];
     [searchField setPlaceholderString:@"What are you looking for?"];
     [searchField setBordered: YES];
